@@ -7,7 +7,6 @@ using Hyperquant.Dto.Dto.UpdateContract;
 using HyperquanTest.ApiGateway.Services;
 using RabbitMQ.Client;
 using Serilog;
-using Serilog.Sinks.Grafana.Loki;
 using ILogger = Serilog.ILogger;
 
 var builder = WebApplication.CreateBuilder(args);
