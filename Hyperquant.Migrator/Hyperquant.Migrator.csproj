@@ -1,0 +1,22 @@
+<Project Sdk="Microsoft.NET.Sdk.Worker">
+
+    <PropertyGroup>
+        <TargetFramework>net9.0</TargetFramework>
+        <Nullable>enable</Nullable>
+        <ImplicitUsings>enable</ImplicitUsings>
+        <UserSecretsId>dotnet-Hyperquant.Migrator-a82b5dd1-faa2-4ce5-9df1-d97742b52b58</UserSecretsId>
+    </PropertyGroup>
+
+    <ItemGroup>
+        <PackageReference Include="Aspire.Npgsql.EntityFrameworkCore.PostgreSQL" Version="9.1.0" />
+        <PackageReference Include="Microsoft.EntityFrameworkCore" Version="9.0.3" />
+        <PackageReference Include="Microsoft.EntityFrameworkCore.Relational" Version="9.0.3" />
+        <PackageReference Include="Microsoft.Extensions.Hosting" Version="9.0.3"/>
+    </ItemGroup>
+
+    <ItemGroup>
+      <ProjectReference Include="..\Hyperquant.Aspire\Hyperquant.Aspire.ServiceDefaults\Hyperquant.Aspire.ServiceDefaults.csproj" />
+      <ProjectReference Include="..\Hyperquant.Repository\Hyperquant.Repository.csproj" />
+      <ProjectReference Include="..\Hyperquant.Data\Hyperquant.Data.csproj" />
+    </ItemGroup>
+</Project>

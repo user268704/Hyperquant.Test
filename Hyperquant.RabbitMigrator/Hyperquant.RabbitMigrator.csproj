@@ -1,0 +1,18 @@
+<Project Sdk="Microsoft.NET.Sdk.Worker">
+
+    <PropertyGroup>
+        <TargetFramework>net9.0</TargetFramework>
+        <Nullable>enable</Nullable>
+        <ImplicitUsings>enable</ImplicitUsings>
+        <UserSecretsId>dotnet-Hyperquant.RabbitMigrator-98f99806-247a-4808-9ef9-75b5328c1294</UserSecretsId>
+    </PropertyGroup>
+
+    <ItemGroup>
+        <PackageReference Include="Aspire.RabbitMQ.Client.v7" Version="9.1.0" />
+        <PackageReference Include="Microsoft.Extensions.Hosting" Version="9.0.3"/>
+    </ItemGroup>
+
+    <ItemGroup>
+      <ProjectReference Include="..\Hyperquant.Aspire\Hyperquant.Aspire.ServiceDefaults\Hyperquant.Aspire.ServiceDefaults.csproj" />
+    </ItemGroup>
+</Project>
