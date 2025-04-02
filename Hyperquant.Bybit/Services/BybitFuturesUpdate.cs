@@ -4,6 +4,7 @@ using Bybit.Net.Clients;
 using Bybit.Net.Enums;
 using Bybit.Net.Interfaces.Clients;
 using Bybit.Net.Objects.Models.V5;
+using Hyperquant.Bybit.Extensions;
 
 namespace Hyperquant.Bybit.Services;
 
@@ -41,13 +42,15 @@ public class BybitFuturesUpdate : IExchangeFuturesUpdate, IHostedService
             _logger.LogInformation(
                 "Got {CountFirst} klines for {FuturesFirst} and {CountSecond} klines for {FuturesSecond}",
                 firstFutures.Count, updateDto.FuturesFirst, secondFutures.Count, updateDto.FuturesSecond);
-            
+
             _logger.LogInformation("Calculating difference between {FuturesFirst} and {FuturesSecond}",
                 updateDto.FuturesFirst, updateDto.FuturesSecond);
+            
             var differences = CalculateDifference(firstFutures, secondFutures);
+
             _logger.LogInformation("Calculated {Count} differences",
                 differences.Count);
-            
+
             return new UpdateContractResult
             {
                 Difference = differences,
@@ -78,32 +81,35 @@ public class BybitFuturesUpdate : IExchangeFuturesUpdate, IHostedService
     {
         var result = new List<Difference>();
 
-        firstFutures = firstFutures.OrderBy(f => f.StartTime).ToList();
-        secondFutures = secondFutures.OrderBy(s => s.StartTime).ToList();
+        firstFutures.ForEach(x => x.StartTime = x.StartTime.Truncate());
+        firstFutures =  firstFutures.OrderBy(f => f.StartTime).ToList();
 
-        var allTimePoints = firstFutures.Select(f => f.StartTime)
-            .Union(secondFutures.Select(s => s.StartTime))
+        secondFutures.ForEach(x => x.StartTime = x.StartTime.Truncate());
+        secondFutures = secondFutures.OrderBy(s => s.StartTime.Truncate()).ToList();
+
+        var allTimePoints = firstFutures.Select(f => f.StartTime.Truncate())
+            .Union(secondFutures.Select(s => s.StartTime.Truncate()))
             .OrderBy(t => t)
             .ToList();
-        
+    
         decimal? lastFirstPrice = null;
         decimal? lastSecondPrice = null;
-        
+    
         foreach (var timePoint in allTimePoints)
         {
-            var firstKline = firstFutures.FirstOrDefault(f => f.StartTime == timePoint);
-            var secondKline = secondFutures.FirstOrDefault(s => s.StartTime == timePoint);
-            
+            var firstKline = firstFutures.FirstOrDefault(f => f.StartTime.Truncate() == timePoint);
+            var secondKline = secondFutures.FirstOrDefault(s => s.StartTime.Truncate() == timePoint);
+        
             if (firstKline != null)
             {
                 lastFirstPrice = firstKline.ClosePrice;
             }
-            
+        
             if (secondKline != null)
             {
                 lastSecondPrice = secondKline.ClosePrice;
             }
-            
+        
             if (lastFirstPrice.HasValue && lastSecondPrice.HasValue)
             {
                 var difference = new Difference
@@ -111,11 +117,11 @@ public class BybitFuturesUpdate : IExchangeFuturesUpdate, IHostedService
                     DateTime = timePoint,
                     DifferencePrice = lastFirstPrice.Value - lastSecondPrice.Value
                 };
-                
+            
                 result.Add(difference);
             }
         }
-        
+    
         return result;
     }
 
@@ -124,8 +130,8 @@ public class BybitFuturesUpdate : IExchangeFuturesUpdate, IHostedService
         try
         {
             var data = await _restClient.V5Api.ExchangeData
-                .GetKlinesAsync(symbol: symbol,
-                    category: Category.Linear,
+                .GetKlinesAsync(category: Category.Linear,
+                    symbol: symbol,
                     interval: interval,
                     startTime: from,
                     endTime: to);
